@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace MoneyBack.Web.Controllers
     public class SpendingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public SpendingsController(ApplicationDbContext context)
+        public SpendingsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Spendings
@@ -58,6 +61,7 @@ namespace MoneyBack.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                spending.User = await _userManager.GetUserAsync(User);
                 _context.Add(spending);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
